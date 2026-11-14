@@ -7,6 +7,7 @@ import { BookOpen, Search, Tag, X, Plus, Trash2, Database } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Modal, { type ModalVariant } from '@/components/ui/Modal';
 import { useAuth } from '@/store/AuthContext';
 
 type GlosarioItem = {
@@ -26,6 +27,7 @@ export default function GlosarioPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTermino, setNewTermino] = useState({ termino: '', definicion: '', categoria: 'concepto' });
   const [saving, setSaving] = useState(false);
+  const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
 
   const userId = user?.id || '';
 
@@ -73,7 +75,11 @@ export default function GlosarioPage() {
         setNewTermino({ termino: '', definicion: '', categoria: 'concepto' });
         setShowAddForm(false);
       } else {
-        alert(data.error || 'Error al crear término');
+        setDialog({
+          title: 'No se pudo crear el término',
+          message: data.error || 'Ocurrió un error al crear el término del glosario.',
+          variant: 'error',
+        });
       }
     } finally {
       setSaving(false);
@@ -314,6 +320,13 @@ export default function GlosarioPage() {
           <p>Este glosario es de carácter educativo. Para consultas específicas, consulte con un profesional de la salud.</p>
         </div>
       </div>
+      <Modal
+        open={dialog !== null}
+        onClose={() => setDialog(null)}
+        title={dialog?.title ?? ''}
+        message={dialog?.message}
+        variant={dialog?.variant ?? 'info'}
+      />
     </Layout>
   );
 }

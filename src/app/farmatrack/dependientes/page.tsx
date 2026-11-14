@@ -17,6 +17,7 @@ import {
 import Layout from '@/components/layout/Layout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Modal, { type ModalVariant } from '@/components/ui/Modal';
 import { useAuth } from '@/store/AuthContext';
 
 type DependienteItem = {
@@ -35,6 +36,7 @@ export default function DependientesPage() {
   const router = useRouter();
 
   const [dependientes, setDependientes] = useState<DependienteItem[]>([]);
+  const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newDependiente, setNewDependiente] = useState({
     nombreDependiente: '',
@@ -84,7 +86,11 @@ export default function DependientesPage() {
         activo: true,
       });
     } else {
-      alert(data.error || 'Error al crear dependiente');
+      setDialog({
+        title: 'No se pudo crear el dependiente',
+        message: data.error || 'Ocurrió un error al crear el perfil de dependiente.',
+        variant: 'error',
+      });
     }
   }
 
@@ -174,6 +180,13 @@ export default function DependientesPage() {
           )}
         </Card>
       </div>
+      <Modal
+        open={dialog !== null}
+        onClose={() => setDialog(null)}
+        title={dialog?.title ?? ''}
+        message={dialog?.message}
+        variant={dialog?.variant ?? 'info'}
+      />
     </Layout>
   );
 }

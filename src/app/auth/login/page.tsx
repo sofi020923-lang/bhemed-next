@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import AuthShell from '@/components/layout/AuthShell';
+import Modal, { type ModalVariant } from '@/components/ui/Modal';
 import { useAuth } from '@/store/AuthContext';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
 
   const {
     register,
@@ -49,10 +51,19 @@ export default function LoginPage() {
         login(result.data.user, result.data.token, result.data.refreshToken);
         router.push('/farmatrack/dashboard');
       } else {
-        alert(result.error || 'Credenciales incorrectas');
+        setDialog({
+          title: 'No pudimos iniciar sesión',
+          message: result.error || 'Verifica tu correo y contraseña e intenta de nuevo.',
+          variant: 'error',
+        });
       }
     } catch (error) {
       console.error('Error en login:', error);
+      setDialog({
+        title: 'Error de conexión',
+        message: 'No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo.',
+        variant: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -125,6 +136,13 @@ export default function LoginPage() {
             </Button>
           </form>
         </Card>
+        <Modal
+          open={dialog !== null}
+          onClose={() => setDialog(null)}
+          title={dialog?.title ?? ''}
+          message={dialog?.message}
+          variant={dialog?.variant ?? 'info'}
+        />
     </AuthShell>
   );
 }

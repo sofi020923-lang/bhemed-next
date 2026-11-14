@@ -17,6 +17,7 @@ import {
 import Layout from '@/components/layout/Layout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Modal, { type ModalVariant } from '@/components/ui/Modal';
 import { useAuth } from '@/store/AuthContext';
 
 type TratamientoItem = {
@@ -72,6 +73,7 @@ export default function TratamientosPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeEditId, setActiveEditId] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -175,9 +177,18 @@ export default function TratamientosPage() {
       });
       const data = await res.json();
       if (data.success) await loadTratamientos();
-      else alert(data.error || 'Error al actualizar estado');
+      else
+        setDialog({
+          title: 'No se pudo actualizar el estado',
+          message: data.error || 'Ocurrió un error al actualizar el tratamiento.',
+          variant: 'error',
+        });
     } catch {
-      alert('Error de conexión');
+      setDialog({
+        title: 'Error de conexión',
+        message: 'No pudimos conectar con el servidor. Intenta de nuevo.',
+        variant: 'error',
+      });
     } finally {
       setSaving(false);
     }
@@ -194,9 +205,18 @@ export default function TratamientosPage() {
       });
       const data = await res.json();
       if (data.success) await loadTratamientos();
-      else alert(data.error || 'Error al eliminar');
+      else
+        setDialog({
+          title: 'No se pudo eliminar',
+          message: data.error || 'Ocurrió un error al eliminar el tratamiento.',
+          variant: 'error',
+        });
     } catch {
-      alert('Error de conexión');
+      setDialog({
+        title: 'Error de conexión',
+        message: 'No pudimos conectar con el servidor. Intenta de nuevo.',
+        variant: 'error',
+      });
     } finally {
       setSaving(false);
     }
@@ -484,6 +504,13 @@ export default function TratamientosPage() {
           </motion.div>
         )}
       </div>
+      <Modal
+        open={dialog !== null}
+        onClose={() => setDialog(null)}
+        title={dialog?.title ?? ''}
+        message={dialog?.message}
+        variant={dialog?.variant ?? 'info'}
+      />
     </Layout>
   );
 }

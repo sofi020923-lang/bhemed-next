@@ -16,6 +16,7 @@ import {
 import Layout from '@/components/layout/Layout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Modal, { type ModalVariant } from '@/components/ui/Modal';
 import { useAuth } from '@/store/AuthContext';
 
 type RecordatorioItem = {
@@ -40,6 +41,7 @@ export default function RecordatoriosPage() {
     tratamientoId: '',
   });
   const [creating, setCreating] = useState(false);
+  const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
 
   const userId = user?.id || '';
 
@@ -82,10 +84,18 @@ export default function RecordatoriosPage() {
         setNewRecordatorio({ fechaHora: '', tipo: 'medicamento', tratamientoId: '' });
         setShowAddForm(false);
       } else {
-        alert(data.error || 'Error al crear recordatorio');
+        setDialog({
+          title: 'No se pudo crear el recordatorio',
+          message: data.error || 'Ocurrió un error al crear el recordatorio.',
+          variant: 'error',
+        });
       }
     } catch (err) {
-      alert('Error de conexión');
+      setDialog({
+        title: 'Error de conexión',
+        message: 'No pudimos conectar con el servidor. Intenta de nuevo.',
+        variant: 'error',
+      });
     } finally {
       setCreating(false);
     }
@@ -288,6 +298,13 @@ export default function RecordatoriosPage() {
           </motion.div>
         )}
       </div>
+      <Modal
+        open={dialog !== null}
+        onClose={() => setDialog(null)}
+        title={dialog?.title ?? ''}
+        message={dialog?.message}
+        variant={dialog?.variant ?? 'info'}
+      />
     </Layout>
   );
 }

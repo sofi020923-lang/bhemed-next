@@ -38,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
         token: null,
         refreshToken: null,
         error: null,
+        isLoading: false,
       }),
       login: (user, token, refreshToken) => set({
         user,
@@ -45,6 +46,7 @@ export const useAuthStore = create<AuthState>()(
         token,
         refreshToken,
         error: null,
+        isLoading: false,
       }),
     }),
     {
@@ -55,6 +57,11 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         refreshToken: state.refreshToken,
       }),
+      // Al terminar la rehidratación, el estado de carga inicial se resuelve
+      // (isLoading nunca se persiste; sin esto, las páginas protegidas quedan en spinner)
+      onRehydrateStorage: () => (state) => {
+        state?.setLoading(false);
+      },
     }
   )
 );

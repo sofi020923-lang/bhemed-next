@@ -10,6 +10,7 @@ import * as z from 'zod';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import AuthShell from '@/components/layout/AuthShell';
 import { useAuth } from '@/store/AuthContext';
 import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
@@ -46,7 +47,7 @@ export default function LoginPage() {
       const result = await res.json();
       if (result.success) {
         login(result.data.user, result.data.token, result.data.refreshToken);
-        router.push('/farmatrack');
+        router.push('/farmatrack/dashboard');
       } else {
         alert(result.error || 'Credenciales incorrectas');
       }
@@ -58,31 +59,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bhemed-ice-blue to-bhemed-ocean-blue/20 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full space-y-8"
-      >
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="mx-auto h-16 w-16 bg-bhemed-ocean-blue rounded-full flex items-center justify-center"
-          >
-            <LogIn className="h-8 w-8 text-white" />
-          </motion.div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
-            Bienvenido a BHEMED
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Inicia sesión para acceder a tu cuenta
-          </p>
-        </div>
-        <Card className="mt-8">
-          <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <AuthShell
+      title="Bienvenido a BHEMED"
+      subtitle="Inicia sesión para acceder a tu cuenta"
+      icon={<LogIn className="h-6 w-6" />}
+      footer={(
+        <p>
+          ¿No tienes una cuenta?{' '}
+          <Link href="/auth/register" className="font-semibold text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue transition-colors">
+            Regístrate aquí
+          </Link>
+        </p>
+      )}
+    >
+        <Card>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <Input
               label="Correo electrónico"
               type="email"
@@ -133,16 +124,7 @@ export default function LoginPage() {
               Iniciar sesión
             </Button>
           </form>
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              ¿No tienes una cuenta?{' '}
-              <Link href="/auth/register" className="font-medium text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue">
-                Regístrate aquí
-              </Link>
-            </p>
-          </div>
         </Card>
-      </motion.div>
-    </div>
+    </AuthShell>
   );
 }

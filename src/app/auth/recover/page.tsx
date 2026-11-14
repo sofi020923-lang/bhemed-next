@@ -10,6 +10,7 @@ import * as z from 'zod';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import AuthShell from '@/components/layout/AuthShell';
 import Link from 'next/link';
 
 const recoverSchema = z.object({
@@ -53,30 +54,18 @@ export default function RecoverPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bhemed-ice-blue to-bhemed-ocean-blue/20 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full space-y-8"
-      >
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="mx-auto h-16 w-16 bg-bhemed-ocean-blue rounded-full flex items-center justify-center"
-          >
-            <Mail className="h-8 w-8 text-white" />
-          </motion.div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
-            Recuperar contraseña
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
-          </p>
-        </div>
-        <Card className="mt-8">
+    <AuthShell
+      title="Recuperar contraseña"
+      subtitle="Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña"
+      icon={<Mail className="h-6 w-6" />}
+      footer={(
+        <Link href="/auth/login" className="inline-flex items-center font-semibold text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Volver a iniciar sesión
+        </Link>
+      )}
+    >
+        <Card>
           {emailSent ? (
             <div className="py-8 text-center">
               <motion.div
@@ -98,7 +87,7 @@ export default function RecoverPage() {
               </Button>
             </div>
           ) : (
-            <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <Input
                 label="Correo electrónico"
                 type="email"
@@ -117,14 +106,7 @@ export default function RecoverPage() {
               </Button>
             </form>
           )}
-          <div className="mt-6 text-center">
-            <Link href="/auth/login" className="inline-flex items-center text-sm text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue">
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Volver a iniciar sesión
-            </Link>
-          </div>
         </Card>
-      </motion.div>
-    </div>
+    </AuthShell>
   );
 }

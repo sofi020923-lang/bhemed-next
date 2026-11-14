@@ -10,6 +10,7 @@ import * as z from 'zod';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import AuthShell from '@/components/layout/AuthShell';
 import Link from 'next/link';
 
 const registerSchema = z.object({
@@ -73,31 +74,21 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bhemed-ice-blue to-bhemed-ocean-blue/20 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full space-y-8"
-      >
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="mx-auto h-16 w-16 bg-bhemed-ocean-blue rounded-full flex items-center justify-center"
-          >
-            <UserPlus className="h-8 w-8 text-white" />
-          </motion.div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
-            Crear cuenta
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Regístrate para comenzar a usar BHEMED
-          </p>
-        </div>
-        <Card className="mt-8">
-          <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <AuthShell
+      title="Crear cuenta"
+      subtitle="Regístrate para comenzar a usar BHEMED"
+      icon={<UserPlus className="h-6 w-6" />}
+      footer={(
+        <p>
+          ¿Ya tienes una cuenta?{' '}
+          <Link href="/auth/login" className="font-semibold text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue transition-colors">
+            Inicia sesión aquí
+          </Link>
+        </p>
+      )}
+    >
+        <Card>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Nombre"
@@ -186,16 +177,7 @@ export default function RegisterPage() {
               Crear cuenta
             </Button>
           </form>
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              ¿Ya tienes una cuenta?{' '}
-              <Link href="/auth/login" className="font-medium text-bhemed-ocean-blue hover:text-bhemed-petroleum-blue">
-                Inicia sesión aquí
-              </Link>
-            </p>
-          </div>
         </Card>
-      </motion.div>
-    </div>
+    </AuthShell>
   );
 }

@@ -89,3 +89,80 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ===== Sistema premium: animaciones SVG ===== */
+@keyframes drawLine {
+  0% { stroke-dashoffset: var(--dash, 400); opacity: 0.4; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes orbitSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbitReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes ekgTrace {
+  0% { stroke-dashoffset: 640; }
+  70%, 100% { stroke-dashoffset: 0; }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+
+@keyframes dotDrift {
+  from { background-position: 0 0; }
+  to { background-position: 28px 28px; }
+}
+
+.svg-draw {
+  stroke-dasharray: var(--dash, 400);
+  animation: drawLine 2.4s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.svg-ekg {
+  stroke-dasharray: 640;
+  animation: ekgTrace 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.svg-breathe {
+  transform-origin: center;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg-draw, .svg-ekg, .svg-breathe {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::selection {
+  background: rgba(54, 136, 184, 0.22);
+}
+
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(54, 136, 184, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.dark .dot-grid {
+  background-image: radial-gradient(circle, rgba(232, 241, 245, 0.08) 1px, transparent 1px);
+}

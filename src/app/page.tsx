@@ -1,127 +1,188 @@
 import Link from 'next/link';
-import {
-  Heart,
-  Pill,
-  Shield,
-  Bell,
-  User,
-  CheckCircle2,
-  ShieldAlert,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import PublicNav from '@/components/layout/PublicNav';
+import Footer from '@/components/layout/Footer';
+import OrbitArt from '@/components/brand/OrbitArt';
+import { VerifyArt, ScheduleArt, ShieldArt } from '@/components/brand/Illustrations';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bhemed-ice-blue to-bhemed-ocean-blue/20 dark:from-gray-900 dark:to-gray-800">
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="30" cy="30" r="20" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'pulse 4s infinite ease-in-out' }} />
-            <circle cx="70" cy="70" r="25" fill="none" stroke="currentColor" strokeWidth="1" style={{ animation: 'pulse 5s infinite ease-in-out' }} />
-          </svg>
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 dark:bg-gray-800/90 text-bhemed-ocean-blue text-sm font-medium shadow-soft mb-6">
-            <Heart className="w-4 h-4" />
-            BHEMED - Educación Farmacéutica
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight">
-            Cuida tu salud,<br className="hidden md:block" />
-            conoce tus medicamentos
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
-            BHEMED te ayuda a entender información farmacológica, organizar tus tratamientos
-            y recordar tus medicamentos de forma segura y sencilla.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/register" className="px-8 py-4 bg-bhemed-ocean-blue text-white rounded-xl font-semibold text-lg hover:bg-bhemed-petroleum-blue transition-all shadow-lg flex items-center justify-center gap-2">
-              <User className="w-5 h-5" />
-              Crear cuenta gratis
-            </Link>
-            <Link href="/farmacheck" className="px-8 py-4 bg-white dark:bg-gray-800 text-bhemed-ocean-blue dark:text-bhemed-ocean-blue rounded-xl font-semibold text-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all shadow flex items-center justify-center gap-2">
-              <Pill className="w-5 h-5" />
-              Explorar FarmaCheck
-            </Link>
-          </div>
-        </div>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <PublicNav />
 
-        {/* Animated feature icons */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-8 opacity-60 dark:opacity-40">
-          <div className="text-center" style={{ animation: 'bounce 3s infinite' }}>
-            <div className="w-12 h-12 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center mx-auto mb-2 shadow-md">
-              <Pill className="w-6 h-6 text-bhemed-ocean-blue" />
+      {/* ============ Hero ============ */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-bhemed-ice-blue via-bhemed-ice-blue/60 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+        <div className="dot-grid absolute inset-0 opacity-60" aria-hidden="true" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-24 lg:pt-20 lg:pb-32">
+          <div className="grid lg:grid-cols-2 gap-14 lg:gap-8 items-center">
+            {/* Copy */}
+            <div className="max-w-xl">
+              <h1 className="text-[2.6rem] leading-[1.05] sm:text-6xl xl:text-[4.2rem] font-extrabold tracking-tight text-bhemed-petroleum-blue dark:text-white">
+                Conoce tus medicamentos.
+                <span className="block text-bhemed-ocean-blue">Toma el control.</span>
+              </h1>
+              <p className="mt-6 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+                BHEMED reúne información farmacológica verificada y el seguimiento de tu
+                tratamiento en un solo lugar: consulta, organiza y no olvides ninguna dosis.
+              </p>
+              <div className="mt-9 flex flex-col sm:flex-row gap-3.5">
+                <Link
+                  href="/auth/register"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-bhemed-ocean-blue px-7 py-3.5 text-base font-semibold text-white shadow-lift hover:bg-bhemed-petroleum-blue hover:-translate-y-0.5 transition-all duration-300 ease-out-expo focus:outline-none focus-visible:ring-2 focus-visible:ring-bhemed-ocean-blue focus-visible:ring-offset-2"
+                >
+                  Crear cuenta gratis
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/farmacheck"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-white dark:bg-gray-800 px-7 py-3.5 text-base font-semibold text-bhemed-petroleum-blue dark:text-bhemed-ice-blue border border-bhemed-ice-blue dark:border-gray-700 shadow-soft hover:border-bhemed-ocean-blue hover:-translate-y-0.5 transition-all duration-300 ease-out-expo focus:outline-none focus-visible:ring-2 focus-visible:ring-bhemed-ocean-blue focus-visible:ring-offset-2"
+                >
+                  Explorar FarmaCheck
+                </Link>
+              </div>
+              {/* Señales de confianza reales */}
+              <dl className="mt-12 grid grid-cols-3 gap-6 border-t border-bhemed-ocean-blue/15 dark:border-gray-700 pt-7">
+                {[
+                  ['Fuentes oficiales', 'cada ficha citada'],
+                  ['Recordatorios 24/7', 'horarios y dosis'],
+                  ['Tus datos', 'siempre privados'],
+                ].map(([title, sub]) => (
+                  <div key={title}>
+                    <dt className="text-sm font-bold text-bhemed-petroleum-blue dark:text-bhemed-ice-blue">
+                      {title}
+                    </dt>
+                    <dd className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Medicamentos</div>
-          </div>
-          <div className="text-center" style={{ animation: 'pulse 2s infinite' }}>
-            <div className="w-12 h-12 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center mx-auto mb-2 shadow-md">
-              <Shield className="w-6 h-6 text-bhemed-ocean-blue" />
+
+            {/* Arte orbital */}
+            <div className="relative lg:pl-6">
+              <OrbitArt />
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Tratamientos</div>
-          </div>
-          <div className="text-center" style={{ animation: 'spin 4s linear infinite' }}>
-            <div className="w-12 h-12 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center mx-auto mb-2 shadow-md">
-              <Bell className="w-6 h-6 text-bhemed-ocean-blue" />
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Recordatorios</div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+      {/* ============ Features ============ */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">¿Por qué BHEMED?</h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Una aplicación completa para el cuidado farmacéutico personal, diseñada pensando en ti.
+          <div className="max-w-2xl">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-bhemed-petroleum-blue dark:text-white">
+              Tres pilares, un cuidado completo
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+              Consultar, organizar y recordar: cada parte de BHEMED existe para que tu
+              tratamiento funcione en la vida real.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
             <FeatureCard
-              icon={<Pill className="w-8 h-8 text-bhemed-ocean-blue" />}
               title="Información verificada"
-              description="Consulta datos farmacológicos respaldados por fuentes bibliográficas oficiales y actualizadas."
+              description="Fichas de medicamentos con datos respaldados por fuentes bibliográficas oficiales, en un lenguaje que sí entiendes."
+              art={<VerifyArt className="w-full h-44" />}
             />
             <FeatureCard
-              icon={<CheckCircle2 className="w-8 h-8 text-bhemed-ocean-blue" />}
-              title="Organiza tus tratamientos"
-              description="Registra tus medicamentos, configura horarios y mantén un historial de tus dosis."
+              title="Tratamientos organizados"
+              description="Registra medicamentos, configura horarios y consulta el historial completo de tus dosis."
+              art={<ScheduleArt className="w-full h-44" />}
+              delay
             />
             <FeatureCard
-              icon={<ShieldAlert className="w-8 h-8 text-bhemed-ocean-blue" />}
               title="Seguro y privado"
-              description="Tus datos de salud están protegidos con autenticación segura y almacenamiento local cifrado."
+              description="Autenticación gestionada con sesiones cifradas y tus fotografías guardadas en almacenamiento privado."
+              art={<ShieldArt className="w-full h-44" />}
             />
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-bhemed-ocean-blue">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">¿Listo para empezar?</h2>
-            <p className="text-white/80 mb-8">Únete a miles de usuarios que ya gestionan su salud con BHEMED.</p>
-            <Link href="/auth/register" className="px-8 py-4 bg-white text-bhemed-ocean-blue rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all shadow-xl flex items-center justify-center gap-2 inline-block">
-              <User className="w-5 h-5" />
-              Crear mi cuenta
-            </Link>
+      {/* ============ Seguridad (banda petroleum) ============ */}
+      <section className="bg-bhemed-petroleum-blue dark:bg-gray-950 py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="max-w-xl">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+              Tu salud es información sensible. La tratamos así.
+            </h2>
+            <p className="mt-4 text-white/75 leading-relaxed">
+              Las sesiones se gestionan con autenticación cifrada de extremo a extremo y las
+              fotografías de tus medicamentos se almacenan en buckets privados con acceso
+              controlado. Nunca compartimos tus datos.
+            </p>
+            <ul className="mt-8 space-y-3.5">
+              {[
+                'Sesiones cifradas con cookies seguras',
+                'Contraseñas nunca almacenadas en la aplicación',
+                'Fotografías en almacenamiento de acceso privado',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-3 text-white/85">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" className="mt-0.5 shrink-0">
+                    <circle cx="10" cy="10" r="9" stroke="#7FBFDF" strokeWidth="1.6" />
+                    <path d="M6 10.2l2.6 2.6L14 7.5" stroke="#7FBFDF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span className="text-sm">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="relative max-w-md w-full mx-auto aspect-square opacity-95">
+            <ShieldArt className="w-full h-full" />
           </div>
         </div>
       </section>
+
+      {/* ============ CTA final ============ */}
+      <section className="relative overflow-hidden py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-bhemed-ice-blue dark:from-gray-900 dark:to-gray-800">
+        <div className="dot-grid absolute inset-0 opacity-50" aria-hidden="true" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-bhemed-petroleum-blue dark:text-white">
+            Empieza hoy, no olvides la próxima dosis
+          </h2>
+          <p className="mt-5 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            Crear tu cuenta toma menos de un minuto. Después, BHEMED hace el resto.
+          </p>
+          <Link
+            href="/auth/register"
+            className="mt-9 inline-flex items-center justify-center gap-2 rounded-full bg-bhemed-ocean-blue px-9 py-4 text-lg font-semibold text-white shadow-lift hover:bg-bhemed-petroleum-blue hover:-translate-y-0.5 transition-all duration-300 ease-out-expo focus:outline-none focus-visible:ring-2 focus-visible:ring-bhemed-ocean-blue focus-visible:ring-offset-2"
+          >
+            Crear mi cuenta
+            <ArrowRight className="w-5 h-5" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({
+  title,
+  description,
+  art,
+  delay = false,
+}: {
+  title: string;
+  description: string;
+  art: React.ReactNode;
+  delay?: boolean;
+}) {
   return (
-    <div className="p-8 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-center hover:border-bhemed-ocean-blue transition-colors">
-      <div className="w-16 h-16 rounded-xl bg-bhemed-ice-blue dark:bg-bhemed-petroleum-blue/30 flex items-center justify-center mx-auto mb-6">
-        {icon}
+    <article className="group relative flex flex-col rounded-3xl border border-bhemed-ice-blue dark:border-gray-700 bg-white dark:bg-gray-800 p-7 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 ease-out-expo">
+      <div className="rounded-2xl bg-gradient-to-br from-bhemed-ice-blue to-white dark:from-gray-700/60 dark:to-gray-800 p-4 mb-6 border border-bhemed-ice-blue/60 dark:border-gray-700">
+        {art}
       </div>
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{description}</p>
-    </div>
+      <h3 className="text-lg font-bold text-bhemed-petroleum-blue dark:text-white">{title}</h3>
+      <p className="mt-2.5 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+        {description}
+      </p>
+      <span
+        aria-hidden="true"
+        className={`absolute top-0 left-7 right-7 h-0.5 rounded-b bg-bhemed-ocean-blue origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out-expo ${
+          delay ? 'delay-75' : ''
+        }`}
+      />
+    </article>
   );
 }

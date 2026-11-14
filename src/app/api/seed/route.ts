@@ -1,24 +1,13 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { users, medicamentos, glosario, tratamientos, recordatorios, historialDosis } from '@/lib/schemas';
+import { medicamentos, glosario } from '@/lib/schemas';
 import { generateId } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // Seed de datos de ejemplo
-    const usersCount = await db.select().from(users);
-    if (usersCount.length === 0) {
-      await db.insert(users).values({
-        id: generateId(),
-        email: 'demo@bhemed.app',
-        nombre: 'Demo',
-        apellido: 'Usuario',
-        role: 'paciente',
-        passwordHash: '$2a$10$demo',
-      });
-    }
+    // Seed de datos de ejemplo (los usuarios se registran vía Neon Auth, no hay seed de usuarios)
     const medsCount = await db.select().from(medicamentos);
     if (medsCount.length === 0) {
       await db.insert(medicamentos).values([

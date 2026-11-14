@@ -5,8 +5,8 @@ Estado: ✅ Compilación exitosa, proyecto listo para desarrollo
 Arquitectura:
 - Next.js 14 (App Router) + TypeScript
 - Tailwind CSS + Lucide React + Framer Motion
-- Drizzle ORM + SQLite (migrable a PostgreSQL remoto)
-- Supabase Auth (configurable)
+- Drizzle ORM + Neon PostgreSQL (serverless)
+- Neon Auth (Managed Better Auth, configurable)
 - Zustand + React Hook Form + Zod
 
 Módulos Implementados:
@@ -15,7 +15,7 @@ Módulos Implementados:
 3. ✅ FarmaTrack (medicamentos personales, tratamientos, recordatorios)
 4. ✅ Perfil de usuario
 5. ✅ API Routes REST completas (14 endpoints)
-6. ✅ Base de datos SQLite con todas las tablas necesarias
+6. ✅ Base de datos Neon PostgreSQL con todas las tablas necesarias
 7. ✅ Diseño UX/UI (colores oficiales, modo claro/oscuro, accesibilidad)
 8. ✅ SVGs animados con Framer Motion
 9. ✅ Estado global con Zustand
@@ -31,13 +31,14 @@ API Routes:
 - /api/seed (datos iniciales)
 
 Base de Datos:
-- SQLite inicializada con 12 tablas
-- Schema listo para migración PostgreSQL
-- Drizzle config listo para `db:push`
+- Neon PostgreSQL (branch production) con 10 tablas
+- Neon Auth (Managed Better Auth) para credenciales y sesiones
+- Neon Object Storage para fotografías (bucket bhemed-medicamentos)
+- Drizzle config listo para `db:generate` y `db:push`
 
 Para continuar desarrollo:
-1. Probar flujos auth en localhost:3001
-2. Agregar subida de fotografías de medicamentos
-3. Configurar Supabase si se necesita auth remoto
+1. ✅ Flujos auth probados end-to-end (login, register, recover, sesiones)
+2. ✅ Subida de fotografías de medicamentos (Neon Object Storage)
+3. Configurar el SMTP de Neon Auth si se necesita envío de emails de recuperación
 4. Implementar notificaciones locales para recordatorios
 5. Agregar perfiles de dependientes y cuidadores

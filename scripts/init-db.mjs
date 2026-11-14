@@ -1,14 +1,22 @@
 /**
- * Script de inicialización de la base de datos SQLite.
+ * Script de inicialización de la base de datos Neon PostgreSQL.
  * Crea todas las tablas definidas en src/lib/schemas.ts si no existen.
- * Ejecutar con: node scripts/init-db.mjs
- *
- * Para migrar a PostgreSQL remoto, usar `npm run db:push` con drizzle-kit
- * y cambiar el dialect en drizzle.config.ts.
+ * Ejecutar con: node scripts/init-db.mjs (usa DATABASE_URL de .env.local o del entorno)
  */
-import { createClient } from '@libsql/client';
+import { neon } from '@neondatabase/serverless';
+import { readFileSync } from 'fs';
 
-const client = createClient({ url: process.env.DATABASE_URL || 'file:./local.db' });
+function databaseUrl() {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  const raw = readFileSync('.env.local', 'utf8');
+  for (const line of raw.split('\n')) {
+    const m = line.match(/^\s*DATABASE_URL\s*=\s*"?([^"\n#]+)"?\s*$/);
+    if (m) return m[1].trim();
+  }
+  throw new Error('DATABASE_URL no encontrada. Ejecuta `neon deploy` para generar .env.local.');
+}
+
+const sql = neon(databaseUrl());
 
 const statements = [
   `CREATE TABLE IF NOT EXISTS users (
@@ -19,11 +27,10 @@ const statements = [
     telefono TEXT,
     fecha_nacimiento TEXT,
     foto_perfil TEXT,
-    password_hash TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
     role TEXT NOT NULL DEFAULT 'paciente',
-    activo INTEGER NOT NULL DEFAULT 1
+    activo BOOLEAN NOT NULL DEFAULT TRUE
   )`,
   `CREATE TABLE IF NOT EXISTS medicamentos (
     id TEXT PRIMARY KEY,
@@ -40,20 +47,20 @@ const statements = [
     conservacion TEXT,
     dosis_comun TEXT,
     via_administracion TEXT,
-    requiere_receta INTEGER NOT NULL DEFAULT 0,
+    requiere_receta BOOLEAN NOT NULL DEFAULT FALSE,
     descripcion_lenguaje_sencillo TEXT,
     fuentes_bibliograficas TEXT,
     fecha_actualizacion TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS glosario (
     id TEXT PRIMARY KEY,
     termino TEXT NOT NULL UNIQUE,
     definicion TEXT NOT NULL,
     categoria TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS medicamentos_personales (
     id TEXT PRIMARY KEY,
@@ -67,8 +74,8 @@ const statements = [
     color TEXT,
     forma TEXT,
     notas TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS tratamientos (
     id TEXT PRIMARY KEY,
@@ -84,8 +91,8 @@ const statements = [
     estado TEXT NOT NULL DEFAULT 'activo',
     notas TEXT,
     creado_por TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS recordatorios (
     id TEXT PRIMARY KEY,
@@ -94,9 +101,9 @@ const statements = [
     fecha_hora TEXT NOT NULL,
     tipo TEXT NOT NULL DEFAULT 'medicamento',
     estado TEXT NOT NULL DEFAULT 'pendiente',
-    notificado INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    notificado BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS historial_dosis (
     id TEXT PRIMARY KEY,
@@ -106,7 +113,7 @@ const statements = [
     dosis_tomada TEXT,
     estado TEXT NOT NULL,
     notas TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS alertas_reposicion (
     id TEXT PRIMARY KEY,
@@ -116,8 +123,8 @@ const statements = [
     stock_minimo INTEGER NOT NULL DEFAULT 5,
     fecha_alerta TEXT,
     estado TEXT NOT NULL DEFAULT 'pendiente',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS perfiles_dependientes (
     id TEXT PRIMARY KEY,
@@ -127,40 +134,29 @@ const statements = [
     fecha_nacimiento TEXT,
     notas_medicas TEXT,
     permisos TEXT,
-    activo INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  )`,
-  `CREATE TABLE IF NOT EXISTS sesiones (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    token TEXT NOT NULL UNIQUE,
-    refresh_token TEXT,
-    ip_address TEXT,
-    user_agent TEXT,
-    expires_at TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_used_at TEXT
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
   `CREATE TABLE IF NOT EXISTS configuraciones_usuario (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL UNIQUE,
     tema TEXT NOT NULL DEFAULT 'light',
     idioma TEXT NOT NULL DEFAULT 'es',
-    notificaciones_push INTEGER NOT NULL DEFAULT 1,
-    notificaciones_email INTEGER NOT NULL DEFAULT 1,
-    recordatorios_sonidos INTEGER NOT NULL DEFAULT 1,
+    notificaciones_push BOOLEAN NOT NULL DEFAULT TRUE,
+    notificaciones_email BOOLEAN NOT NULL DEFAULT TRUE,
+    recordatorios_sonidos BOOLEAN NOT NULL DEFAULT TRUE,
     zona_horaria TEXT NOT NULL DEFAULT 'America/Mexico_City',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text),
+    updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP::text)
   )`,
 ];
 
 async function main() {
-  for (const sql of statements) {
-    await client.execute(sql);
+  for (const stmt of statements) {
+    await sql.query(stmt);
   }
-  console.log('✅ Base de datos SQLite inicializada: tablas creadas correctamente.');
+  console.log('✅ Base de datos Neon PostgreSQL inicializada: tablas creadas correctamente.');
 }
 
 main().catch((err) => {

@@ -1,24 +1,27 @@
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schemas';
 
-// Provider local: SQLite (libSQL) - listo para soportar uno remoto como PostgreSQL
-// Para usar PostgreSQL remoto, cambiar la URL por la cadena de conexión de Supabase/Neon/ etc.
-// y cambiar el dialect en drizzle.config.ts
-const client = createClient({
-  url: process.env.DATABASE_URL || 'file:./local.db',
-});
+// Provider: Neon PostgreSQL (driver serverless HTTP, ideal para App Router/serverless)
+// La cadena de conexión se gestiona con `neon deploy` y vive en .env.local (DATABASE_URL)
+const connectionString = process.env.DATABASE_URL;
 
-export const db = drizzle(client, { schema });
+if (!connectionString) {
+  throw new Error(
+    'DATABASE_URL no está definida. Ejecuta `neon deploy` para generar .env.local con las credenciales de Neon.'
+  );
+}
+
+export const db = drizzle(neon(connectionString), { schema });
 
 export type DB = typeof db;
 
 // Función para inicializar la base de datos (crear tablas si no existen)
 export async function initDatabase() {
   try {
-    // Las tablas se crean automáticamente con drizzle-kit push
+    // Las tablas se crean con `npm run db:init` (scripts/init-db.mjs) o `npm run db:push`
     // Este espacio queda para migraciones adicionales o seeds
-    console.log('Base de datos SQLite inicializada correctamente');
+    console.log('Base de datos Neon PostgreSQL inicializada correctamente');
   } catch (error) {
     console.error('Error inicializando la base de datos:', error);
     throw error;

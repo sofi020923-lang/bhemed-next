@@ -8,8 +8,9 @@ Una aplicación segura, intuitiva y accesible para conocer tus medicamentos, com
 - **Tailwind CSS**
 - **Lucide React** (iconos)
 - **Framer Motion** (animaciones SVG)
-- **Drizzle ORM** + **better-sqlite3** (SQLite local, migrable a PostgreSQL)
-- **Supabase Auth** (autenticación, con posibilidad de cambiar a provider remoto como PostgreSQL)
+- **Drizzle ORM** + **@neondatabase/serverless** (Neon PostgreSQL serverless)
+- **Neon Auth** (Managed Better Auth) para autenticación
+- **Neon Object Storage** (S3 API) para fotografías
 - **Zustand** (estado global)
 - **React Hook Form** + **Zod** (formularios)
 
@@ -49,9 +50,9 @@ bhemed-next/
 │   │   ├── layout/               # Header, Footer, Sidebar, Layout principal
 │   │   └── common/               # ActionButton, AnimatedDetails
 │   ├── lib/
-│   │   ├── db.ts                 # Drizzle + SQLite (listo para PostgreSQL remoto)
+│   │   ├── db.ts                 # Drizzle + Neon PostgreSQL (driver serverless)
 │   │   ├── schemas.ts            # Tipos Drizzle
-│   │   ├── supabase.ts           # Supabase client
+│   │   ├── storage.ts            # Neon Object Storage (S3)
 │   │   ├── utils.ts              # Helpers (id, truncateText, capitalizeText, etc.)
 │   │   ├── auth.ts               # Auth utilities
 │   │   └── seed.ts               # Seed de datos de ejemplo
@@ -93,11 +94,11 @@ bhemed-next/
 ## Seguridad
 - No exponer claves privadas ni credenciales en código.
 - Proteger datos de salud, fotografías y perfiles de dependientes.
-- Implementar Row Level Security (RLS) en Supabase y PostgreSQL.
+- Row Level Security disponible en PostgreSQL; las sesiones las gestiona Neon Auth (cookies firmadas).
 - No diagnosticar enfermedades ni prescribir medicamentos.
 
 ## Próxima etapa
-Crear las rutas API REST, configurar Supabase (o PostgreSQL remoto), inicializar base de datos SQLite y migrar a PostgreSQL cuando esté disponible.
+Backend conectado a Neon (PostgreSQL + Auth + Object Storage). Pendiente: configurar SMTP en Neon Auth para emails de recuperación y aplicar RLS según roles.
 
 ---
 *Documento generado según BHEMED master instructions.*

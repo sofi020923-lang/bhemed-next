@@ -34,8 +34,16 @@ export default function RecoverPage() {
   const onSubmit = async (data: RecoverFormData) => {
     setIsSubmitting(true);
     try {
-      // Simulación - en producción usar Supabase
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // El flujo de recuperación lo gestiona Neon Auth a través de /api/auth/recover
+      const res = await fetch('/api/auth/recover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'No se pudo procesar la solicitud');
+      }
       setEmailSent(true);
     } catch (error) {
       console.error('Error en recuperación:', error);

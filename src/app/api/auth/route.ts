@@ -1,11 +1,31 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth/server';
 import { db } from '@/lib/db';
-import { users, sesiones } from '@/lib/schemas';
+import { users } from '@/lib/schemas';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
-import { generateId } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
+
+// Perfil de aplicación sincronizado con el usuario de Neon Auth.
+// Si el usuario de Auth aún no tiene perfil en la tabla `users`, lo crea a partir
+// del nombre registrado en Neon Auth.
+async function ensureProfile(authUser: { id: string; email?: string; name?: string }) {
+  const existing = await db.select().from(users).where(eq(users.id, authUser.id)).limit(1);
+  if (existing.length > 0) return existing[0];
+
+  const nameParts = (authUser.name ?? '').trim().split(/\s+/);
+  const nombre = nameParts[0] || 'Usuario';
+  const apellido = nameParts.slice(1).join(' ') || '—';
+  await db.insert(users).values({
+    id: authUser.id,
+    email: authUser.email ?? '',
+    nombre,
+    apellido,
+    role: 'paciente',
+  });
+  const created = await db.select().from(users).where(eq(users.id, authUser.id)).limit(1);
+  return created[0];
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,23 +33,32 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json({ success: false, error: 'Email y contraseña requeridos' }, { status: 400 });
     }
-    // Buscar usuario en SQLite local
-    const user = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    if (user.length === 0) {
-      return NextResponse.json({ success: false, error: 'Usuario no encontrado' }, { status: 404 });
+
+    // Autenticación delegada a Neon Auth (Better Auth gestionado). La sesión se
+    // establece vía cookie firmada; devolvemos además el token para el store
+    // del cliente (contrato existente del frontend).
+    // El servicio valida el header Origin: propagamos el origin de la request.
+    const origin = req.headers.get('origin') ?? new URL(req.url).origin;
+    const { data, error } = await auth.signIn.email({ email, password }, { headers: { origin } });
+
+    if (error || !data) {
+      const status = (error as { status?: number })?.status ?? 401;
+      const message = status === 404 ? 'Usuario no encontrado' : 'Email o contraseña incorrectos';
+      return NextResponse.json({ success: false, error: message }, { status: 401 });
     }
-    const valid = await bcrypt.compare(password, user[0].passwordHash);
-    if (!valid) {
-      return NextResponse.json({ success: false, error: 'Contraseña incorrecta' }, { status: 401 });
-    }
-    // Crear sesión
-    const token = generateId();
-    const refreshToken = generateId();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    await db.insert(sesiones).values({ id: generateId(), userId: user[0].id, token, refreshtToken: refreshToken, expiresAt });
+
+    const session = data as {
+      user?: { id: string; email?: string; name?: string };
+      token?: string;
+      session?: { token?: string; expiresAt?: string };
+    };
+    const authUser = session.user!;
+    const profile = await ensureProfile(authUser);
+    const token = session.session?.token ?? session.token ?? '';
+
     return NextResponse.json({
       success: true,
-      data: { user: user[0], token, refreshToken, expiresAt },
+      data: { user: profile, token, refreshToken: token, expiresAt: session.session?.expiresAt ?? null },
     });
   } catch (error) {
     console.error('Error en login:', error);
@@ -37,12 +66,16 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE() {
   try {
-    const { token } = await req.json();
-    await db.delete(sesiones).where(eq(sesiones.token, token));
+    // Cierra la sesión en Neon Auth y elimina la cookie firmada
+    const { error } = await auth.signOut();
+    if (error) {
+      return NextResponse.json({ success: false, error: 'Error al cerrar sesión' }, { status: 500 });
+    }
     return NextResponse.json({ success: true, message: 'Sesión cerrada' });
   } catch (error) {
+    console.error('Error en logout:', error);
     return NextResponse.json({ success: false, error: 'Error al cerrar sesión' }, { status: 500 });
   }
 }

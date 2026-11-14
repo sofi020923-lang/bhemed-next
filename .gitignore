@@ -5,14 +5,14 @@ node_modules/
 
 # Configuraciones locales
 .env
+.env*.local
 
 # IDE
 .vscode/*
 !.vscode/extensions.json
 
 # Producción
-.next/static
-.next/data
+.next/
 
 # Logs
 logs
@@ -40,3 +40,4 @@ out
 
 # OpenCode
 .opencode/
+.neon

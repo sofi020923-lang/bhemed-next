@@ -1,30 +1,28 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   integer,
-  sqliteTable,
+  pgTable,
   text,
-  primaryKey,
-  uniqueIndex,
-} from 'drizzle-orm/sqlite-core';
+} from 'drizzle-orm/pg-core';
 
-// Tabla de usuarios
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(), // UUID
+// Tabla de usuarios (perfiles de aplicación; las credenciales y sesiones las gestiona Neon Auth)
+export const users = pgTable('users', {
+  id: text('id').primaryKey(), // UUID (id del usuario de Neon Auth)
   email: text('email').notNull().unique(),
   nombre: text('nombre').notNull(),
   apellido: text('apellido').notNull(),
   telefono: text('telefono'),
   fechaNacimiento: text('fecha_nacimiento'),
   fotoPerfil: text('foto_perfil'),
-  passwordHash: text('password_hash').notNull(), // Para auth local (opcional, Supabase puede manejar esto)
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   role: text('role').default('paciente').notNull(), // paciente, cuidador, admin
-  activo: integer('activo', { mode: 'boolean' }).default(true).notNull(),
+  activo: boolean('activo').default(true).notNull(),
 });
 
 // Tabla de medicamentos (catálogo general - FarmaCheck)
-export const medicamentos = sqliteTable('medicamentos', {
+export const medicamentos = pgTable('medicamentos', {
   id: text('id').primaryKey(),
   nombreComercial: text('nombre_comercial').notNull(),
   nombreGenerico: text('nombre_generico').notNull(),
@@ -39,7 +37,7 @@ export const medicamentos = sqliteTable('medicamentos', {
   conservacion: text('conservacion'),
   dosisComun: text('dosis_comun'),
   viaAdministracion: text('via_administracion'), // oral, intravenosa, tópica, etc.
-  requiereReceta: integer('requiere_receta', { mode: 'boolean' }).default(false).notNull(),
+  requiereReceta: boolean('requiere_receta').default(false).notNull(),
   descripcionLenguajeSencillo: text('descripcion_lenguaje_sencillo'),
   fuentesBibliograficas: text('fuentes_bibliograficas'), // JSON array
   fechaActualizacion: text('fecha_actualizacion'),
@@ -48,7 +46,7 @@ export const medicamentos = sqliteTable('medicamentos', {
 });
 
 // Tabla de glosario farmacológico
-export const glosario = sqliteTable('glosario', {
+export const glosario = pgTable('glosario', {
   id: text('id').primaryKey(),
   termino: text('termino').notNull().unique(),
   definicion: text('definicion').notNull(),
@@ -58,7 +56,7 @@ export const glosario = sqliteTable('glosario', {
 });
 
 // Tabla de medicamentos personales (FarmaTrack)
-export const medicamentosPersonales = sqliteTable('medicamentos_personales', {
+export const medicamentosPersonales = pgTable('medicamentos_personales', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
   nombre: text('nombre').notNull(),
@@ -75,7 +73,7 @@ export const medicamentosPersonales = sqliteTable('medicamentos_personales', {
 });
 
 // Tabla de tratamientos
-export const tratamientos = sqliteTable('tratamientos', {
+export const tratamientos = pgTable('tratamientos', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
   medicamentoPersonalId: text('medicamento_personal_id'),
@@ -94,20 +92,20 @@ export const tratamientos = sqliteTable('tratamientos', {
 });
 
 // Tabla de recordatorios
-export const recordatorios = sqliteTable('recordatorios', {
+export const recordatorios = pgTable('recordatorios', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
   tratamientoId: text('tratamiento_id').notNull(),
   fechaHora: text('fecha_hora').notNull(),
   tipo: text('tipo').default('medicamento').notNull(), // medicamento, reposicion, cita
   estado: text('estado').default('pendiente').notNull(), // pendiente, tomado, omitido, reprogramado
-  notificado: integer('notificado', { mode: 'boolean' }).default(false).notNull(),
+  notificado: boolean('notificado').default(false).notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 // Tabla de historial de dosis
-export const historialDosis = sqliteTable('historial_dosis', {
+export const historialDosis = pgTable('historial_dosis', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
   tratamientoId: text('tratamiento_id').notNull(),
@@ -119,7 +117,7 @@ export const historialDosis = sqliteTable('historial_dosis', {
 });
 
 // Tabla de alertas de reposición
-export const alertasReposicion = sqliteTable('alertas_reposicion', {
+export const alertasReposicion = pgTable('alertas_reposicion', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(),
   medicamentoPersonalId: text('medicamento_personal_id').notNull(),
@@ -132,7 +130,7 @@ export const alertasReposicion = sqliteTable('alertas_reposicion', {
 });
 
 // Tabla de perfiles de personas dependientes
-export const perfilesDependientes = sqliteTable('perfiles_dependientes', {
+export const perfilesDependientes = pgTable('perfiles_dependientes', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull(), // ID del cuidador principal
   nombreDependiente: text('nombre_dependiente').notNull(),
@@ -140,33 +138,20 @@ export const perfilesDependientes = sqliteTable('perfiles_dependientes', {
   fechaNacimiento: text('fecha_nacimiento'),
   notasMedicas: text('notas_medicas'),
   permisos: text('permisos'), // JSON con permisos específicos
-  activo: integer('activo', { mode: 'boolean' }).default(true).notNull(),
+  activo: boolean('activo').default(true).notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
-// Tabla de sesiones (para auth local)
-export const sesiones = sqliteTable('sesiones', {
-  id: text('id').primaryKey(),
-  userId: text('user_id').notNull(),
-  token: text('token').notNull().unique(),
-  refreshtToken: text('refresh_token'),
-  ipAddress: text('ip_address'),
-  userAgent: text('user_agent'),
-  expiresAt: text('expires_at').notNull(),
-  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
-  lastUsedAt: text('last_used_at'),
-});
-
 // Tabla de configuración del usuario
-export const configuracionesUsuario = sqliteTable('configuraciones_usuario', {
+export const configuracionesUsuario = pgTable('configuraciones_usuario', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().unique(),
   tema: text('tema').default('light').notNull(), // light, dark, system
   idioma: text('idioma').default('es').notNull(),
-  notificacionesPush: integer('notificaciones_push', { mode: 'boolean' }).default(true).notNull(),
-  notificacionesEmail: integer('notificaciones_email', { mode: 'boolean' }).default(true).notNull(),
-  recordatoriosSonidos: integer('recordatorios_sonidos', { mode: 'boolean' }).default(true).notNull(),
+  notificacionesPush: boolean('notificaciones_push').default(true).notNull(),
+  notificacionesEmail: boolean('notificaciones_email').default(true).notNull(),
+  recordatoriosSonidos: boolean('recordatorios_sonidos').default(true).notNull(),
   zonaHoraria: text('zona_horaria').default('America/Mexico_City').notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`).notNull(),

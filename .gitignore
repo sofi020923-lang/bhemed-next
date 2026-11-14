@@ -1,0 +1,42 @@
+# Ignorar archivos y directorios
+
+# Dependencias
+node_modules/
+
+# Configuraciones locales
+.env
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+
+# Producción
+.next/static
+.next/data
+
+# Logs
+logs
+*.log
+
+# Caracteres especiales
+.*.
+
+# Entrada de terminal
+.DS_Store
+Thumbs.db
+
+# Backup
+*.bak
+*.swp
+*~
+
+# Distribución
+dist
+out
+
+# Versiones
+.pnpm*
+.yarn*
+
+# OpenCode
+.opencode/

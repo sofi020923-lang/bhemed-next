@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="calendarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3688B8"/>
+      <stop offset="100%" style="stop-color:#24566F"/>
+    </linearGradient>
+  </defs>
+  <!-- Calendario -->
+  <motion.rect x="15" y="15" width="70" height="70" rx="8" fill="url(#calendarGrad)" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
+  <!-- Header -->
+  <motion.rect x="15" y="15" width="70" height="22" rx="8" ry="0" fill="#FFFFFF" fillOpacity="0.1" />
+  <!-- Días -->
+  <g transform="translate(25, 45)">
+    <motion.rect x="0" y="0" width="12" height="12" rx="2" fill="#FFFFFF" fillOpacity="0.3" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+    <motion.rect x="16" y="0" width="12" height="12" rx="2" fill="#FFFFFF" fillOpacity="0.3" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 0.2 }} />
+    <motion.rect x="32" y="0" width="12" height="12" rx="2" fill="#3688B8" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }} />
+    <motion.rect x="0" y="16" width="12" height="12" rx="2" fill="#FFFFFF" fillOpacity="0.3" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 0.6 }} />
+    <motion.rect x="16" y="16" width="12" height="12" rx="2" fill="#FFFFFF" fillOpacity="0.3" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 0.8 }} />
+    <motion.rect x="32" y="16" width="12" height="12" rx="2" fill="#FFFFFF" fillOpacity="0.3" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} />
+  </g>
+</svg>

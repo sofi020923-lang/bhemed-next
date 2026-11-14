@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="searchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3688B8"/>
+      <stop offset="100%" style="stop-color:#24566F"/>
+    </linearGradient>
+  </defs>
+  <!-- Lupa -->
+  <g transform="translate(50, 50)">
+    <motion.circle
+      r="20"
+      fill="none"
+      stroke="url(#searchGrad)"
+      strokeWidth="4"
+      animate={{ r: [18, 24, 18], strokeWidth: [3, 5, 3] }}
+      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+    />
+    <motion.line
+      x1="15" y1="15" x2="30" y2="30"
+      stroke="url(#searchGrad)" strokeWidth="4" strokeLinecap="round"
+      animate={{ rotate: [-30, 30, -30], x2: [28, 32, 28], y2: [28, 32, 28] }}
+      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+    />
+    <!-- Partículas de búsqueda -->
+    <motion.circle cx="-30" cy="-30" r="2" fill="#3688B8" animate={{ opacity: [0, 1, 0], cx: [-25, -35, -25], cy: [-25, -35, -25] }} transition={{ duration: 2, repeat: Infinity }} />
+    <motion.circle cx="30" cy="-20" r="3" fill="#24566F" animate={{ opacity: [0, 1, 0], cx: [25, 35, 25], cy: [-15, -25, -15] }} transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }} />
+  </g>
+</svg>

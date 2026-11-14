@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="pillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3688B8"/>
+      <stop offset="100%" style="stop-color:#24566F"/>
+    </linearGradient>
+  </defs>
+  <!-- Cuerpo de la pastilla -->
+  <motion.rect
+    x="20" y="35" width="60" height="30"
+    rx="15" fill="url(#pillGrad)"
+    animate={{ y: [35, 30, 35], scale: [1, 1.05, 1] }}
+    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+  />
+  <!-- Línea divisoria -->
+  <motion.line
+    x1="50" y1="35" x2="50" y2="65"
+    stroke="#FFFFFF" strokeWidth="2" strokeOpacity="0.7"
+    animate={{ strokeOpacity: [0.5, 1, 0.5], y1: [35, 32, 35], y2: [65, 68, 65] }}
+    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+  />
+  <!-- Brillo -->
+  <motion.ellipse
+    cx="40" cy="42" rx="12" ry="5"
+    fill="#FFFFFF" fillOpacity="0.2"
+    animate={{ opacity: [0.1, 0.3, 0.1] }}
+    transition={{ duration: 2, repeat: Infinity }}
+  />
+</svg>

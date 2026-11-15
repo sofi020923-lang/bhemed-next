@@ -50,6 +50,10 @@ export default function DependientesPage() {
   const userId = user?.id || '';
 
   useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
     if (userId) {
       fetch(`/api/dependientes?userId=${userId}`)
         .then(res => res.json())
@@ -57,7 +61,7 @@ export default function DependientesPage() {
           if (data.success) setDependientes(data.data || []);
         });
     }
-  }, [userId]);
+  }, [userId, isAuthenticated, isLoading, router]);
 
   async function handleAddDependiente() {
     const res = await fetch('/api/dependientes', {

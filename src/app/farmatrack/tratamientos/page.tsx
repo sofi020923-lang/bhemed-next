@@ -76,14 +76,14 @@ export default function TratamientosPage() {
   const [dialog, setDialog] = useState<{ title: string; message?: string; variant: ModalVariant } | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/auth/login');
       return;
     }
     if (user?.id) {
       loadTratamientos();
     }
-  }, [isAuthenticated, user?.id, router]);
+  }, [isAuthenticated, isLoading, user?.id, router]);
 
   async function loadTratamientos() {
     setLoading(true);

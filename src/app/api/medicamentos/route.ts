@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { medicamentos } from '@/lib/schemas';
-import { eq, ilike, or } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 import { generateId } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -13,18 +13,12 @@ export async function GET(req: Request) {
 
     let data;
     if (search) {
+      // El buscador filtra solo por nombre comercial del medicamento
       const pattern = `%${search}%`;
       data = await db
         .select()
         .from(medicamentos)
-        .where(
-          or(
-            ilike(medicamentos.nombreComercial, pattern),
-            ilike(medicamentos.nombreGenerico, pattern),
-            ilike(medicamentos.principioActivo, pattern),
-            ilike(medicamentos.concentracion, pattern)
-          )
-        );
+        .where(ilike(medicamentos.nombreComercial, pattern));
     } else {
       data = await db.select().from(medicamentos);
     }

@@ -1,57 +1,76 @@
 // Carga el dataset completo de medicamentos INVIMA Colombia en Neon PostgreSQL
 // Uso: DATABASE_URL="..." node scripts/import-invima-to-db.mjs
-// Requiere: @neondatabase/serverless + drizzle-orm (ya en node_modules)
+// Requisitos: archivo data/medicamentos.json generado por `node scripts/import-invima.mjs`
 
 import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
 import { readFileSync } from 'fs';
-import { medicamentos } from './src/lib/schemas.ts';
 
 function databaseUrl() {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
-  throw new Error('DATABASE_URL no está definida. Ejecuta `neon deploy` y configura .env.local.');
+  try {
+    const raw = readFileSync('.env.local', 'utf8');
+    for (const line of raw.split('\n')) {
+      const m = line.match(/^\s*DATABASE_URL\s*=\s*"?([^"\n#]+)"?\s*$/);
+      if (m) return m[1].trim();
+    }
+  } catch {}
+  throw new Error('DATABASE_URL no encontrada. Ejecuta `neon deploy` o exporta DATABASE_URL.');
 }
 
 const CHUNK_SIZE = 500;
 
-async function main() {
-  const ds = neon(databaseUrl());
-  const db = drizzle(ds, { schema: { medicamentos } });
+const COLUMNS = [
+  'id','nombre_comercial','nombre_generico','principio_activo','concentracion',
+  'forma_farmaceutica','laboratorio','indicaciones','contraindicaciones',
+  'reacciones_adversas','interacciones','conservacion','dosis_comun',
+  'via_administracion','requiere_receta','descripcion_lenguaje_sencillo',
+  'fuentes_bibliograficas','fecha_actualizacion'
+];
 
-  // 1) Cargar dataset
+const UPDATE_SET = COLUMNS
+  .filter(c => c !== 'id')
+  .map(c => `${c} = EXCLUDED.${c}`)
+  .join(', ');
+
+function toValue(v, column) {
+  if (column === 'requiere_receta') return !!v;
+  if (v === undefined || v === null) return null;
+  const s = String(v);
+  return s === '' ? null : s;
+}
+
+async function main() {
+  const sql = neon(databaseUrl());
+
   const data = JSON.parse(readFileSync('./data/medicamentos.json', 'utf8'));
   console.log(`📦 Dataset cargado: ${data.length} medicamentos`);
 
-  // 2) Limpiar tabla existente (opcional, para evitar duplicados)
   console.log('🗑️  Limpiando tabla medicamentos...');
-  await db.delete(medicamentos);
+  await sql.query('DELETE FROM medicamentos');
   console.log('✅ Tabla limpiada.');
 
-  // 3) Insertar en lotes de 500
   let inserted = 0;
   for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-    const chunk = data.slice(i, i + CHUNK_SIZE).map((m) => ({
-      id: m.id,
-      nombreComercial: m.nombreComercial,
-      nombreGenerico: m.nombreGenerico,
-      principioActivo: m.principioActivo,
-      concentracion: m.concentracion || null,
-      formaFarmaceutica: m.formaFarmaceutica || null,
-      laboratorio: m.laboratorio || null,
-      indicaciones: m.indicaciones || null,
-      contraindicaciones: m.contraindicaciones || null,
-      reaccionesAdversas: m.reaccionesAdversas || null,
-      interacciones: m.interacciones || null,
-      conservacion: m.conservacion || null,
-      dosisComun: m.dosisComun || null,
-      viaAdministracion: m.viaAdministracion || null,
-      requiereReceta: m.requiereReceta ?? false,
-      descripcionLenguajeSencillo: m descripcionLenguajeSencillo || null,
-      fuentesBibliograficas: m.fuentesBibliograficas || null,
-      fechaActualizacion: m.fechaActualizacion || new Date().toISOString().slice(0, 10),
-    }));
+    const chunk = data.slice(i, i + CHUNK_SIZE);
+    // construir query parametrizada: ($1..$N), ($N+1..$2N) ...
+    const params = [];
+    const rows = [];
+    for (const m of chunk) {
+      const values = [
+        m.id, m.nombreComercial, m.nombreGenerico, m.principioActivo, m.concentracion,
+        m.formaFarmaceutica, m.laboratorio, m.indicaciones, m.contraindicaciones,
+        m.reaccionesAdversas, m.interacciones, m.conservacion, m.dosisComun,
+        m.viaAdministracion, m.requiereReceta, m.descripcionLenguajeSencillo,
+        m.fuentesBibliograficas, m.fechaActualizacion,
+      ].map((v, idx) => toValue(v, COLUMNS[idx]));
+      const base = params.length;
+      const placeholders = values.map((_, idx) => `$${base + idx + 1}`).join(', ');
+      rows.push(`(${placeholders})`);
+      params.push(...values);
+    }
+    const query = `INSERT INTO medicamentos (${COLUMNS.join(', ')}) VALUES ${rows.join(', ')} ON CONFLICT (id) DO UPDATE SET ${UPDATE_SET}`;
     try {
-      await db.insert(medicamentos).values(chunk);
+      await sql.query(query, params);
       inserted += chunk.length;
       process.stdout.write(`\r✅ Insertados: ${inserted}/${data.length}`);
     } catch (error) {
@@ -60,18 +79,17 @@ async function main() {
     }
   }
 
-  // 4) Verificar conteo
-  const count = await db.select().from(medicamentos);
-  console.log(`\n🎉 Carga completada: ${count.length} medicamentos en la base de datos.`);
+  const rowsCount = await sql.query('SELECT count(*)::int AS count FROM medicamentos');
+  console.log(`\n🎉 Carga completada: ${rowsCount[0].count} medicamentos en la base de datos.`);
 
-  // 5) Probar búsqueda de medicamentos comunes
-  const testTerms = ['omeprazol', 'montelukast', 'salbutamol', 'paracetamol'];
+  const testTerms = ['omeprazol', 'montelukast', 'salbutamol', 'paracetamol', 'amoxicilina'];
   for (const term of testTerms) {
-    const results = await db
-      .select()
-      .from(medicamentos)
-      .where(sql`LOWER(${medicamentos.nombreComercial}) LIKE ${'%' + term + '%'} OR LOWER(${medicamentos.nombreGenerico}) LIKE ${'%' + term + '%'} OR LOWER(${medicamentos.principioActivo}) LIKE ${'%' + term + '%'}`);
-    console.log(`🔍 "${term}": ${results.length} resultados`);
+    const results = await sql.query(
+      `SELECT count(*)::int AS count FROM medicamentos
+       WHERE LOWER(nombre_comercial) LIKE $1 OR LOWER(nombre_generico) LIKE $1 OR LOWER(principio_activo) LIKE $1`,
+      [`%${term}%`]
+    );
+    console.log(`🔍 "${term}": ${results[0].count} resultados`);
   }
 }
 

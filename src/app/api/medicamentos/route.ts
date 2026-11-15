@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { medicamentos } from '@/lib/schemas';
-import { eq, like, or } from 'drizzle-orm';
+import { eq, ilike, or } from 'drizzle-orm';
 import { generateId } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -19,10 +19,10 @@ export async function GET(req: Request) {
         .from(medicamentos)
         .where(
           or(
-            like(medicamentos.nombreComercial, pattern),
-            like(medicamentos.nombreGenerico, pattern),
-            like(medicamentos.principioActivo, pattern),
-            like(medicamentos.concentracion, pattern)
+            ilike(medicamentos.nombreComercial, pattern),
+            ilike(medicamentos.nombreGenerico, pattern),
+            ilike(medicamentos.principioActivo, pattern),
+            ilike(medicamentos.concentracion, pattern)
           )
         );
     } else {

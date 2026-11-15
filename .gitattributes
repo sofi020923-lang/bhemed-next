@@ -1,0 +1,2 @@
+data/medicamentos.json filter=lfs diff=lfs merge=lfs -text
+data/medicamentos.csv filter=lfs diff=lfs merge=lfs -text

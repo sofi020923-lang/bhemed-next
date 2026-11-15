@@ -106,7 +106,9 @@ function toBhemed(row, idx) {
     conservacion: 'Según instrucciones del fabricante (ver prospecto).',
     dosisComun: 'Según prescripción médica. Ver ficha técnica INVIMA.',
     viaAdministracion: cleanText(row.viaadministracion),
-    requiereReceta: cleanText(row.muestramedica) === 'Si',
+    // INVIMA no expone venta libre/receta en este dataset; se deja falso por defecto
+    // (el campo `muestramedica` indica muestra médica, NO venta con receta).
+    requiereReceta: false,
     descripcionLenguajeSencillo: descATC
       ? `Medicamento que contiene ${base || pa}. Pertenece al grupo ATC ${atc} (${descATC}).`
       : `Medicamento que contiene ${base || pa}.`,
@@ -139,7 +141,7 @@ async function main() {
   const where = getArg('where', "estadocum='Activo'");
   const maxRows = parseInt(getArg('limit', '1000000'), 10);
   const outJson = getArg('output', 'data/medicamentos-invima.json');
-  const dedupe = getArg('dedupe', 'principioActivo'); // 'none' | 'principioActivo'
+  const dedupe = getArg('dedupe', 'none'); // 'none' | 'principioActivo'
 
   console.log('=== BHEMED · Importador INVIMA (Datos Abiertos Colombia) ===');
   console.log(`Filtro: ${where}`);
